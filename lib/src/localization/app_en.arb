@@ -1,0 +1,6 @@
+{
+  "appTitle": "topic_trail",
+  "@appTitle": {
+    "description": "The title of the application"
+  }
+}

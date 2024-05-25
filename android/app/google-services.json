@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "270067789991",
+    "project_id": "topic-trail",
+    "storage_bucket": "topic-trail.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:270067789991:android:36d133d4a3a113e4192b82",
+        "android_client_info": {
+          "package_name": "com.example.topic_trail"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "270067789991-2mkm79brr5bi0u6jn98ed2fvhuntrkna.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBGgq9JoQbucvw0EtTxBX7xFb0cBj0Y2VU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "270067789991-2mkm79brr5bi0u6jn98ed2fvhuntrkna.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "270067789991-7qhpqoq56ps28sp2kshrvs9ks3qiiads.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.topicTrail"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

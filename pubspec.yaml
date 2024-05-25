@@ -1,0 +1,64 @@
+name: topic_trail
+description: "A new way to consume information and stories."
+
+# Prevent accidental publishing to pub.dev.
+publish_to: "none"
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.3.4 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.6
+  rive: ^0.13.5
+  flutter_svg: ^2.0.9
+  firebase_core: ^2.31.1
+  firebase_analytics: ^10.10.6
+  firebase_auth: ^4.19.6
+  cloud_firestore: ^4.17.4
+  cloud_functions: ^4.7.5
+  firebase_storage: ^11.7.6
+  firebase_ui_auth: ^1.14.0
+  provider: ^6.1.2
+  font_awesome_flutter: ^10.1.0
+  image_picker: ^1.1.1
+  share_plus: ^9.0.0
+
+  flutter_localizations:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
+
+  # Enable generation of localized Strings from arb files.
+  generate: true
+
+  assets:
+    - assets/avaters/
+    - assets/Backgrounds/
+    - assets/icons/
+    - assets/RiveAssets/
+    - assets/images/
+
+  fonts:
+    - family: Intel
+      fonts:
+        - asset: assets/Fonts/Inter-Regular.ttf
+        - asset: assets/Fonts/Inter-SemiBold.ttf
+          weight: 600
+    - family: Poppins
+      fonts:
+        - asset: assets/Fonts/Poppins-Bold.ttf
+          weight: 700
+  #
+  # For details regarding fonts from package dependencies,
+  # see https://flutter.dev/custom-fonts/#from-packages
