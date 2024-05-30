@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart'; // Import Firestore
 
 import '../../models/course.dart';
 import 'components/course_card.dart';
 import 'components/secondary_course_card.dart';
 
-class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+class ProfilePage extends StatelessWidget {
+  const ProfilePage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -21,54 +20,32 @@ class HomePage extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.all(20),
                 child: Text(
-                  "Recent Events",
+                  "Profile Data",
                   style: Theme.of(context).textTheme.headlineMedium!.copyWith(
                       color: Colors.black, fontWeight: FontWeight.bold),
                 ),
               ),
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
-                child: StreamBuilder<QuerySnapshot>(
-                  stream: FirebaseFirestore.instance.collection('topics').orderBy('timestamp', descending: true).snapshots(),
-                  builder: (context, snapshot) {
-                    if (snapshot.hasError) {
-                      return Text('Error: ${snapshot.error}');
-                    }
-
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Center(child: CircularProgressIndicator());
-                    }
-
-                    List<DocumentSnapshot> documents = snapshot.data!.docs;
-                    return Row(
-                      children: documents.map((document) {
-                        Map<String, dynamic>? data = document.data() as Map<String, dynamic>?;
-
-                        if (data == null) {
-                          return SizedBox(); // Return an empty widget or handle null case as per your requirement
-                        }
-
-                        String title = data['name'] ?? '';
-                        String iconSrc = data['iconSrc'] ?? 'assets/icons/ios.svg';
-                        Color color = data['color'] ?? const Color(0xFF7553F6); // Provide a default color
-
-                        return Padding(
+                child: Row(
+                  children: courses
+                      .map(
+                        (course) => Padding(
                           padding: const EdgeInsets.only(left: 20),
                           child: CourseCard(
-                            title: title,
-                            iconSrc: iconSrc,
-                            color: color,
+                            title: course.title,
+                            iconSrc: course.iconSrc,
+                            color: course.color,
                           ),
-                        );
-                      }).toList(),
-                    );
-                  },
+                        ),
+                      )
+                      .toList(),
                 ),
               ),
               Padding(
                 padding: const EdgeInsets.all(20),
                 child: Text(
-                  "Topics",
+                  "More",
                   style: Theme.of(context).textTheme.headlineSmall!.copyWith(
                       color: Colors.black, fontWeight: FontWeight.bold),
                 ),

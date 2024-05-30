@@ -2,11 +2,23 @@ import 'package:flutter/material.dart';
 
 import '../../../models/menu.dart';
 import '../../../utils/rive_utils.dart';
+import '../../onboding/onboding_screen.dart';
 import 'info_card.dart';
 import 'side_menu.dart';
 
 class SideBar extends StatefulWidget {
-  const SideBar({super.key});
+  final String userName;
+  final String userBio;
+  final bool isUserSignedIn;
+  final VoidCallback onSignOut;
+
+  const SideBar({
+    super.key,
+    required this.userName,
+    required this.userBio,
+    required this.isUserSignedIn,
+    required this.onSignOut,
+  });
 
   @override
   State<SideBar> createState() => _SideBarState();
@@ -14,6 +26,7 @@ class SideBar extends StatefulWidget {
 
 class _SideBarState extends State<SideBar> {
   Menu selectedSideMenu = sidebarMenus.first;
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -31,10 +44,11 @@ class _SideBarState extends State<SideBar> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const InfoCard(
-                name: "Your Name",
-                bio: "Bio",
+              InfoCard(
+                name: widget.userName,
+                bio: widget.userBio,
               ),
+              /*
               Padding(
                 padding: const EdgeInsets.only(left: 24, top: 32, bottom: 16),
                 child: Text(
@@ -87,6 +101,31 @@ class _SideBarState extends State<SideBar> {
                         },
                       ))
                   .toList(),
+              */
+              Spacer(),
+              ListTile(
+                leading: Icon(
+                  widget.isUserSignedIn
+                      ? Icons.logout
+                      : Icons.login,
+                  color: Colors.white,
+                ),
+                title: Text(
+                  widget.isUserSignedIn ? 'Sign Out' : 'Sign In',
+                  style: TextStyle(color: Colors.white),
+                ),
+                onTap: () {
+                  if (widget.isUserSignedIn) {
+                    widget.onSignOut();
+                  } else {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => OnbodingScreen()),
+                    );
+                  }
+                },
+              ),
             ],
           ),
         ),

@@ -77,7 +77,7 @@ void showCustomDialog(BuildContext context, {required ValueChanged onValue}) {
                       const Padding(
                         padding: EdgeInsets.symmetric(vertical: 24),
                         child: Text(
-                          "Sign up with Email, Apple or Google",
+                          "Sign in for Invited users only",
                           style: TextStyle(color: Colors.black54),
                         ),
                       ),

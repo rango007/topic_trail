@@ -1,5 +1,9 @@
 # topic_trail
 
+* to build apk file
+flutter build apk --release
+This will generate an APK file in the build/app/outputs/flutter-apk directory.
+
 A new Flutter project.
 
 ## Getting Started

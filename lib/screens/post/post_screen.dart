@@ -5,14 +5,21 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
-class CreateTopicScreen extends StatefulWidget {
+class PostPage extends StatefulWidget {
+  const PostPage({super.key});
+
   @override
-  _CreateTopicScreenState createState() => _CreateTopicScreenState();
+  _PostPageState createState() => _PostPageState();
 }
 
-class _CreateTopicScreenState extends State<CreateTopicScreen> {
+class _PostPageState extends State<PostPage> {
   final TextEditingController _topicController = TextEditingController();
+  final TextEditingController _topicDetailController = TextEditingController(); // Add this line
+  final TextEditingController _otherCategoryController = TextEditingController();
   final List<Map<String, dynamic>> _questions = [];
+
+  String? _postType;
+  String? _category;
   String? _topicImageUrl;
   bool _isUploadingTopicImage = false;
   Map<String, bool> _isUploadingQuestionImage = {};
@@ -24,7 +31,7 @@ class _CreateTopicScreenState extends State<CreateTopicScreen> {
         'id': questionId,
         'text': questionText,
         'options': [],
-        'imageUrl': null, // Initialize image URL as null
+        'imageUrl': null,
       });
     });
   }
@@ -42,15 +49,17 @@ class _CreateTopicScreenState extends State<CreateTopicScreen> {
 
   void _editQuestion(String questionId, String newText) {
     setState(() {
-      _questions
-          .firstWhere((question) => question['id'] == questionId)['text'] = newText;
+      _questions.firstWhere(
+          (question) => question['id'] == questionId)['text'] = newText;
     });
   }
 
-  void _editOption(String questionId, int optionIndex, String newOption, String? nextQuestionId) {
+  void _editOption(String questionId, int optionIndex, String newOption,
+      String? nextQuestionId) {
     setState(() {
       _questions
-          .firstWhere((question) => question['id'] == questionId)['options'][optionIndex] = {
+              .firstWhere((question) => question['id'] == questionId)['options']
+          [optionIndex] = {
         'text': newOption,
         'nextQuestionId': nextQuestionId,
       };
@@ -58,7 +67,8 @@ class _CreateTopicScreenState extends State<CreateTopicScreen> {
   }
 
   Future<void> _pickImage(String questionId) async {
-    final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+    final pickedFile =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       File imageFile = File(pickedFile.path);
       setState(() {
@@ -66,15 +76,16 @@ class _CreateTopicScreenState extends State<CreateTopicScreen> {
       });
       String imageUrl = await _uploadImage(imageFile, 'question_images');
       setState(() {
-        _questions
-            .firstWhere((question) => question['id'] == questionId)['imageUrl'] = imageUrl;
+        _questions.firstWhere(
+            (question) => question['id'] == questionId)['imageUrl'] = imageUrl;
         _isUploadingQuestionImage[questionId] = false;
       });
     }
   }
 
   Future<void> _pickTopicImage() async {
-    final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+    final pickedFile =
+        await ImagePicker().pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       File imageFile = File(pickedFile.path);
       setState(() {
@@ -90,17 +101,21 @@ class _CreateTopicScreenState extends State<CreateTopicScreen> {
 
   Future<String> _uploadImage(File imageFile, String folder) async {
     String fileName = DateTime.now().millisecondsSinceEpoch.toString();
-    Reference storageRef = FirebaseStorage.instance.ref().child(folder).child(fileName);
+    Reference storageRef =
+        FirebaseStorage.instance.ref().child(folder).child(fileName);
     UploadTask uploadTask = storageRef.putFile(imageFile);
     TaskSnapshot taskSnapshot = await uploadTask;
     return await taskSnapshot.ref.getDownloadURL();
   }
 
   void _submitTopic() async {
-    if (_topicController.text.isEmpty || _questions.isEmpty) {
+    if (_topicController.text.isEmpty ||
+        _questions.isEmpty ||
+        _postType == null ||
+        _category == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Please enter a topic name and at least one question.'),
+          content: Text('Please fill all the fields.'),
           duration: Duration(seconds: 3),
         ),
       );
@@ -112,13 +127,22 @@ class _CreateTopicScreenState extends State<CreateTopicScreen> {
       Timestamp now = Timestamp.now();
       await FirebaseFirestore.instance.collection('topics').doc(topicId).set({
         'name': _topicController.text,
+        'detail': _topicDetailController.text,
         'creatorId': FirebaseAuth.instance.currentUser!.uid,
         'timestamp': now,
-        'imageUrl': _topicImageUrl, // Save topic image URL
+        'imageUrl': _topicImageUrl,
+        'postType': _postType,
+        'category':
+            _category == 'Others' ? _otherCategoryController.text : _category,
       });
 
       for (var question in _questions) {
-        await FirebaseFirestore.instance.collection('topics').doc(topicId).collection('questions').doc(question['id']).set({
+        await FirebaseFirestore.instance
+            .collection('topics')
+            .doc(topicId)
+            .collection('questions')
+            .doc(question['id'])
+            .set({
           'text': question['text'],
           'options': question['options'],
           'imageUrl': question['imageUrl'],
@@ -132,7 +156,7 @@ class _CreateTopicScreenState extends State<CreateTopicScreen> {
         ),
       );
 
-      Navigator.pop(context); // Return to previous screen after successful submission
+      Navigator.pop(context);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -146,24 +170,112 @@ class _CreateTopicScreenState extends State<CreateTopicScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text("Create Topic")),
-      body: SingleChildScrollView(
+    return SafeArea(
+      child: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(20),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              const SizedBox(height: 40),
+              Text(
+                "Create Trails",
+                style: Theme.of(context)
+                    .textTheme
+                    .headlineMedium!
+                    .copyWith(color: Colors.black, fontWeight: FontWeight.bold),
+              ),
+              DropdownButtonFormField<String>(
+                value: _postType,
+                decoration: InputDecoration(labelText: 'Post Type'),
+                items: [
+                  DropdownMenuItem(
+                      value: 'Recent Events', child: Text('Recent Events')),
+                  DropdownMenuItem(
+                      value: 'General Topic', child: Text('General Topic')),
+                ],
+                onChanged: (value) {
+                  setState(() {
+                    _postType = value;
+                  });
+                },
+              ),
+              DropdownButtonFormField<String>(
+                value: _category,
+                decoration: InputDecoration(labelText: 'Category'),
+                items: [
+                  DropdownMenuItem(
+                      value: 'Recent Events', child: Text('Recent Events')),
+                  DropdownMenuItem(value: 'Opinion', child: Text('Opinion')),
+                  DropdownMenuItem(value: 'Finance', child: Text('Finance')),
+                  DropdownMenuItem(value: 'Politics', child: Text('Politics')),
+                  DropdownMenuItem(
+                      value: 'Technology', child: Text('Technology')),
+                  DropdownMenuItem(
+                      value: 'Education', child: Text('Education')),
+                  DropdownMenuItem(
+                      value: 'Healthcare', child: Text('Healthcare')),
+                  DropdownMenuItem(
+                      value: 'Lifestyle', child: Text('Lifestyle')),
+                  /*
+                  DropdownMenuItem(
+                      value: 'Specific Topic', child: Text('Specific Topic')),
+                      */
+                ],
+                onChanged: (value) {
+                  setState(() {
+                    _category = value;
+                  });
+                },
+              ),
+              if (_category == 'Specific Topic')
+                DropdownButtonFormField<String>(
+                  value: _category,
+                  decoration: InputDecoration(labelText: 'Sub Category'),
+                  items: [
+                    DropdownMenuItem(value: 'Finance', child: Text('Finance')),
+                    DropdownMenuItem(
+                        value: 'Politics', child: Text('Politics')),
+                    DropdownMenuItem(
+                        value: 'Technology', child: Text('Technology')),
+                    DropdownMenuItem(
+                        value: 'Education', child: Text('Education')),
+                    DropdownMenuItem(
+                        value: 'Healthcare', child: Text('Healthcare')),
+                    DropdownMenuItem(
+                        value: 'Lifestyle', child: Text('Lifestyle')),
+                    DropdownMenuItem(value: 'Others', child: Text('Others')),
+                  ],
+                  onChanged: (value) {
+                    setState(() {
+                      _category = value;
+                    });
+                  },
+                ),
+              if (_category == 'Others')
+                TextField(
+                  controller: _otherCategoryController,
+                  decoration: InputDecoration(labelText: 'Specify Category'),
+                ),
               TextField(
                 controller: _topicController,
                 decoration: InputDecoration(labelText: 'Topic Name'),
+                maxLength: 200,
+              ),
+              SizedBox(height: 16),
+              TextField(
+                controller: _topicDetailController,
+                decoration: InputDecoration(labelText: 'Topic Detail'),
+                maxLength: 500,
+                maxLines: null,
               ),
               SizedBox(height: 16),
               Stack(
                 children: [
                   ElevatedButton(
                     onPressed: _pickTopicImage,
-                    child: Text('Pick Topic Image'),
+                    child: Text('Pick Topic Image',
+                        style: TextStyle(color: Colors.black)),
                   ),
                   if (_isUploadingTopicImage)
                     Positioned.fill(
@@ -196,20 +308,21 @@ class _CreateTopicScreenState extends State<CreateTopicScreen> {
                       onEditOption: _editOption,
                       onPickImage: _pickImage,
                       questions: _questions,
-                      isUploadingImage: _isUploadingQuestionImage[_questions[index]['id']] ?? false,
+                      isUploadingImage:
+                          _isUploadingQuestionImage[_questions[index]['id']] ??
+                              false,
                     );
                   } else {
                     return AddQuestionButton(
-                      onPressed: () {
-                        _showAddQuestionDialog();
-                      },
+                      onPressed: _showAddQuestionDialog,
                     );
                   }
                 },
               ),
               ElevatedButton(
                 onPressed: _submitTopic,
-                child: Text("Submit Topic"),
+                child:
+                    Text("Submit Topic", style: TextStyle(color: Colors.black)),
               ),
             ],
           ),
@@ -289,7 +402,8 @@ class QuestionWidget extends StatelessWidget {
               children: [
                 ElevatedButton(
                   onPressed: () => onPickImage(question['id']),
-                  child: Text('Pick Image'),
+                  child:
+                      Text('Pick Image', style: TextStyle(color: Colors.black)),
                 ),
                 if (isUploadingImage)
                   Positioned.fill(
@@ -318,8 +432,13 @@ class QuestionWidget extends StatelessWidget {
                 return ListTile(
                   title: TextField(
                     decoration: InputDecoration(labelText: 'Option Text'),
-                    onChanged: (newOption) => onEditOption(question['id'], index, newOption, question['options'][index]['nextQuestionId']),
-                    controller: TextEditingController(text: question['options'][index]['text']),
+                    onChanged: (newOption) => onEditOption(
+                        question['id'],
+                        index,
+                        newOption,
+                        question['options'][index]['nextQuestionId']),
+                    controller: TextEditingController(
+                        text: question['options'][index]['text']),
                   ),
                   subtitle: DropdownButtonFormField<String>(
                     decoration: InputDecoration(labelText: 'Link to Question'),
@@ -331,7 +450,8 @@ class QuestionWidget extends StatelessWidget {
                       );
                     }).toList(),
                     onChanged: (value) {
-                      onEditOption(question['id'], index, question['options'][index]['text'], value);
+                      onEditOption(question['id'], index,
+                          question['options'][index]['text'], value);
                     },
                   ),
                 );
@@ -345,7 +465,6 @@ class QuestionWidget extends StatelessWidget {
                   builder: (BuildContext context) {
                     String newOption = '';
                     String? selectedQuestionId;
-
                     return StatefulBuilder(
                       builder: (context, setState) {
                         return AlertDialog(
@@ -354,12 +473,14 @@ class QuestionWidget extends StatelessWidget {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               TextField(
-                                decoration: InputDecoration(labelText: 'Option Text'),
+                                decoration:
+                                    InputDecoration(labelText: 'Option Text'),
                                 onChanged: (value) => newOption = value,
                               ),
                               SizedBox(height: 16),
                               DropdownButtonFormField<String>(
-                                decoration: InputDecoration(labelText: 'Link to Question'),
+                                decoration: InputDecoration(
+                                    labelText: 'Link to Question'),
                                 value: selectedQuestionId,
                                 items: questions.map((question) {
                                   return DropdownMenuItem<String>(
@@ -379,7 +500,8 @@ class QuestionWidget extends StatelessWidget {
                             TextButton(
                               onPressed: () {
                                 Navigator.of(context).pop();
-                                onAddOption(question['id'], newOption, selectedQuestionId);
+                                onAddOption(question['id'], newOption,
+                                    selectedQuestionId);
                               },
                               child: Text('Add'),
                             ),
@@ -390,7 +512,7 @@ class QuestionWidget extends StatelessWidget {
                   },
                 );
               },
-              child: Text('Add Option'),
+              child: Text('Add Option', style: TextStyle(color: Colors.black)),
             ),
           ],
         ),
@@ -402,13 +524,14 @@ class QuestionWidget extends StatelessWidget {
 class AddQuestionButton extends StatelessWidget {
   final VoidCallback onPressed;
 
-  const AddQuestionButton({Key? key, required this.onPressed}) : super(key: key);
+  const AddQuestionButton({Key? key, required this.onPressed})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
       onPressed: onPressed,
-      child: Text("Add Question"),
+      child: Text("Add Question", style: TextStyle(color: Colors.black)),
     );
   }
 }

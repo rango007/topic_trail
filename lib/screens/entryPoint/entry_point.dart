@@ -2,13 +2,22 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:rive/rive.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../constants.dart';
 import '../../screens/home/home_screen.dart';
+import '../../screens/search/search_screen.dart';
+import '../../screens/history/history_screen.dart';
+import '../../screens/notification/notification_screen.dart';
+import '../../screens/profile/profile_screen.dart';
+import '../../screens/post/post_screen.dart';
+import '../onboding/onboding_screen.dart';
 import '../../utils/rive_utils.dart';
 
 import '../../models/menu.dart';
 import 'components/btm_nav_item.dart';
 import 'components/menu_btn.dart';
+import 'components/post_btn.dart';
 import 'components/side_bar.dart';
 
 class EntryPoint extends StatefulWidget {
@@ -18,14 +27,17 @@ class EntryPoint extends StatefulWidget {
   State<EntryPoint> createState() => _EntryPointState();
 }
 
-class _EntryPointState extends State<EntryPoint>
-    with SingleTickerProviderStateMixin {
+class _EntryPointState extends State<EntryPoint> with SingleTickerProviderStateMixin {
   bool isSideBarOpen = false;
 
   Menu selectedBottonNav = bottomNavItems.first;
   Menu selectedSideMenu = sidebarMenus.first;
 
   late SMIBool isMenuOpenInput;
+
+  late String userName = "Your Name";
+  late String userBio = "Bio";
+  bool isUserSignedIn = false;
 
   void updateSelectedBtmNav(Menu menu) {
     if (selectedBottonNav != menu) {
@@ -41,24 +53,96 @@ class _EntryPointState extends State<EntryPoint>
 
   @override
   void initState() {
+    super.initState();
     _animationController = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 200))
-      ..addListener(
-        () {
-          setState(() {});
-        },
-      );
+      ..addListener(() {
+        setState(() {});
+      });
     scalAnimation = Tween<double>(begin: 1, end: 0.8).animate(CurvedAnimation(
         parent: _animationController, curve: Curves.fastOutSlowIn));
     animation = Tween<double>(begin: 0, end: 1).animate(CurvedAnimation(
         parent: _animationController, curve: Curves.fastOutSlowIn));
-    super.initState();
+
+    _checkUserStatus();
   }
 
   @override
   void dispose() {
     _animationController.dispose();
     super.dispose();
+  }
+
+  void _toggleSidebar() {
+    isMenuOpenInput.value = !isMenuOpenInput.value;
+
+    if (_animationController.value == 0) {
+      _animationController.forward();
+    } else {
+      _animationController.reverse();
+    }
+
+    setState(() {
+      isSideBarOpen = !isSideBarOpen;
+    });
+  }
+
+  void _onPostBtnPressed() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      _toggleSidebar();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Please sign in to create a post.'),
+          duration: Duration(seconds: 3),
+        ),
+      );
+    } else {
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        builder: (context) => const PostPage(),
+      );
+    }
+  }
+
+  Future<void> _checkUserStatus() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      setState(() {
+        isUserSignedIn = true;
+      });
+
+      // Fetch user details from Firestore
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .get();
+
+      if (userDoc.exists) {
+        setState(() {
+          userName = userDoc['name'] ?? "Your Name";
+          userBio = userDoc['bio'] ?? "Bio";
+        });
+      }
+    } else {
+      setState(() {
+        isUserSignedIn = false;
+      });
+    }
+  }
+
+  void _onSignOut() async {
+    await FirebaseAuth.instance.signOut();
+    setState(() {
+      isUserSignedIn = false;
+      userName = "Your Name";
+      userBio = "Bio";
+    });
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => OnbodingScreen()),
+    );
   }
 
   @override
@@ -76,7 +160,12 @@ class _EntryPointState extends State<EntryPoint>
             curve: Curves.fastOutSlowIn,
             left: isSideBarOpen ? 0 : -288,
             top: 0,
-            child: const SideBar(),
+            child: SideBar(
+              userName: userName,
+              userBio: userBio,
+              isUserSignedIn: isUserSignedIn,
+              onSignOut: _onSignOut,
+            ),
           ),
           Transform(
             alignment: Alignment.center,
@@ -88,11 +177,11 @@ class _EntryPointState extends State<EntryPoint>
               offset: Offset(animation.value * 265, 0),
               child: Transform.scale(
                 scale: scalAnimation.value,
-                child: const ClipRRect(
-                  borderRadius: BorderRadius.all(
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.all(
                     Radius.circular(24),
                   ),
-                  child: HomePage(),
+                  child: _buildPage(),  // Update to dynamically build the page
                 ),
               ),
             ),
@@ -103,21 +192,7 @@ class _EntryPointState extends State<EntryPoint>
             left: isSideBarOpen ? 220 : 0,
             top: 16,
             child: MenuBtn(
-              press: () {
-                isMenuOpenInput.value = !isMenuOpenInput.value;
-
-                if (_animationController.value == 0) {
-                  _animationController.forward();
-                } else {
-                  _animationController.reverse();
-                }
-
-                setState(
-                  () {
-                    isSideBarOpen = !isSideBarOpen;
-                  },
-                );
-              },
+              press: _toggleSidebar,
               riveOnInit: (artboard) {
                 final controller = StateMachineController.fromArtboard(
                     artboard, "State Machine");
@@ -127,6 +202,23 @@ class _EntryPointState extends State<EntryPoint>
                 isMenuOpenInput =
                     controller.findInput<bool>("isOpen") as SMIBool;
                 isMenuOpenInput.value = true;
+              },
+            ),
+          ),
+          Positioned(
+            right: 16,
+            top: 16,
+            child: PostBtn(
+              press: _onPostBtnPressed,
+              riveOnInit: (artboard) {
+                final controller = StateMachineController.fromArtboard(
+                    artboard, "State Machine");
+
+                artboard.addController(controller!);
+
+                final isPostOpenInput =
+                    controller.findInput<bool>("isOpen") as SMIBool;
+                isPostOpenInput.value = true;
               },
             ),
           ),
@@ -177,5 +269,23 @@ class _EntryPointState extends State<EntryPoint>
         ),
       ),
     );
+  }
+
+  // Method to build the main content based on the selected bottom nav item
+  Widget _buildPage() {
+    switch (selectedBottonNav.id) {  // Use an identifier for the Menu items
+      case 'home':
+        return HomePage();
+      case 'search':
+        return SearchPage();
+      case 'history':
+        return HistoryPage();
+      case 'notification':
+        return NotificationPage();
+      case 'profile':
+        return ProfilePage();
+      default:
+        return HomePage();
+    }
   }
 }

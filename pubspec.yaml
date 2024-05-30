@@ -26,6 +26,8 @@ dependencies:
   font_awesome_flutter: ^10.1.0
   image_picker: ^1.1.1
   share_plus: ^9.0.0
+  shared_preferences: ^2.0.13
+  shimmer: ^3.0.0
 
   flutter_localizations:
     sdk: flutter
@@ -48,6 +50,8 @@ flutter:
     - assets/icons/
     - assets/RiveAssets/
     - assets/images/
+    - assets/Animations/swipe_arrows.gif
+    - assets/Animations/swipe_left.gif
 
   fonts:
     - family: Intel
@@ -59,6 +63,20 @@ flutter:
       fonts:
         - asset: assets/Fonts/Poppins-Bold.ttf
           weight: 700
+    - family: Merriweather
+      fonts:
+        - asset: assets/Fonts/Merriweather/Merriweather-Regular.ttf
+        - asset: assets/Fonts/Merriweather/Merriweather-Bold.ttf
+          weight: 700
+        - asset: assets/Fonts/Merriweather/Merriweather-Italic.ttf
+          style: italic
+        - asset: assets/Fonts/Merriweather/Merriweather-BoldItalic.ttf
+          weight: 700
+          style: italic
+    - family: Quicksand
+      fonts:
+        - asset: assets/Fonts/Quicksand/static/Quicksand-Regular.ttf
+        
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages

@@ -5,71 +5,55 @@ class CourseCard extends StatelessWidget {
   const CourseCard({
     Key? key,
     required this.title,
+    required this.imageUrl,
     this.color = const Color(0xFF7553F6),
-    this.iconSrc = "assets/icons/ios.svg",
+    this.fullScreen = false,
   }) : super(key: key);
 
-  final String title, iconSrc;
+  final String title, imageUrl;
   final Color color;
+  final bool fullScreen;
 
   @override
   Widget build(BuildContext context) {
+    final double cardHeight = fullScreen ? MediaQuery.of(context).size.height : 280;
+    final double twoThirdsCardHeight = cardHeight * (2 / 3);
+
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-      height: 280,
-      width: 260,
+      height: cardHeight,
+      width: fullScreen ? MediaQuery.of(context).size.width : 260,
       decoration: BoxDecoration(
-        color: color,
-        borderRadius: const BorderRadius.all(Radius.circular(30)),
+        borderRadius: const BorderRadius.all(Radius.circular(0)),
+        image: DecorationImage(
+          image: NetworkImage(imageUrl),
+          fit: BoxFit.cover,
+        ),
       ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Stack(
         children: [
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.only(top: 6, right: 8),
-              child: Column(
-                children: [
-                  Text(
-                    title,
-                    style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                        color: Colors.white, fontWeight: FontWeight.w600),
-                  ),
-                  const Padding(
-                    padding: EdgeInsets.only(top: 12, bottom: 8),
-                    child: Text(
-                      "Build and animate an iOS app from scratch",
-                      style: TextStyle(
-                        color: Colors.white38,
-                      ),
+          Container(
+            decoration: BoxDecoration(
+              borderRadius: const BorderRadius.all(Radius.circular(0)),
+              color: Colors.black.withOpacity(0.5), // Semi-transparent overlay
+            ),
+          ),
+          Positioned(
+            left: 16,
+            right: 16,
+            top: twoThirdsCardHeight,
+            child: Align(
+              alignment: Alignment.topLeft,
+              child: Text(
+                title,
+                style: Theme.of(context).textTheme.headlineMedium!.copyWith(
+                      fontFamily: 'Merriweather',
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
                     ),
-                  ),
-                  const Text(
-                    "61 SECTIONS - 11 HOURS",
-                    style: TextStyle(
-                      color: Colors.white38,
-                    ),
-                  ),
-                  const Spacer(),
-                  Row(
-                    children: List.generate(
-                      3,
-                      (index) => Transform.translate(
-                        offset: Offset((-10 * index).toDouble(), 0),
-                        child: CircleAvatar(
-                          radius: 20,
-                          backgroundImage: AssetImage(
-                            "assets/avaters/Avatar ${index + 1}.jpg",
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+                textAlign: TextAlign.left,
               ),
             ),
           ),
-          SvgPicture.asset(iconSrc),
         ],
       ),
     );
