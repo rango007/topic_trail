@@ -132,6 +132,7 @@ class CategoryPage extends StatelessWidget {
                     .collection('topics')
                     .where('postType', isEqualTo: 'General Topic')
                     .where('category', isEqualTo: category)
+                    .orderBy('timestamp', descending: true)
                     .snapshots(),
                 builder: (context, snapshot) {
                   if (snapshot.hasError) {

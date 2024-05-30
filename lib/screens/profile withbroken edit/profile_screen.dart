@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'editTopic/edit_topic_page.dart'; // Import the EditTopicPage
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({Key? key}) : super(key: key);
@@ -126,7 +127,7 @@ class ProfilePage extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 20),
-              _buildUserTopics(currentUser.uid),
+              _buildUserTopics(currentUser.uid, context),
             ],
           ),
         );
@@ -134,7 +135,7 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
-  Widget _buildUserTopics(String userId) {
+  Widget _buildUserTopics(String userId, BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: StreamBuilder<QuerySnapshot>(
@@ -199,6 +200,17 @@ class ProfilePage extends StatelessWidget {
                           ),
                         ],
                       ),
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.edit),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => EditTopicPage(topicId: doc.id),
+                          ),
+                        );
+                      },
                     ),
                   ],
                 ),

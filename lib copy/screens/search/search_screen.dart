@@ -194,7 +194,6 @@ class SearchPage extends StatelessWidget {
                 stream: FirebaseFirestore.instance
                     .collection('topics')
                     .where('postType', isEqualTo: 'General Topic')
-                      .orderBy('timestamp', descending: true)
                     .snapshots(),
                 builder: (context, snapshot) {
                   if (snapshot.hasError) {

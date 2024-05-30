@@ -36,7 +36,6 @@ class HomePage extends StatelessWidget {
                 }
 
                 String title = data['name'] ?? '';
-                String detail = data['detail'] ?? ''; // Get detail text from Firestore
                 String imageUrl = data['imageUrl'] ?? 'assets/icons/ios.svg';
                 Color color = data['color'] ?? const Color(0xFF7553F6); // Provide a default color
 
@@ -65,7 +64,6 @@ class HomePage extends StatelessWidget {
                   },
                   child: CourseCard(
                     title: title,
-                    detail: detail,
                     imageUrl: imageUrl,
                     color: color,
                     fullScreen: true,
