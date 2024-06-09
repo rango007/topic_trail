@@ -1,4 +1,4 @@
-package com.example.topic_trail
+package com.walletmantech.trails
 
 import io.flutter.embedding.android.FlutterActivity
 

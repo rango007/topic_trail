@@ -1,1 +1,66 @@
-{"flutter":{"platforms":{"android":{"default":{"projectId":"topic-trail","appId":"1:270067789991:android:36d133d4a3a113e4192b82","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"topic-trail","configurations":{"android":"1:270067789991:android:36d133d4a3a113e4192b82","ios":"1:270067789991:ios:e95f0aab6bb29540192b82","macos":"1:270067789991:ios:e95f0aab6bb29540192b82","web":"1:270067789991:web:fe888c6ceb17d43d192b82","windows":"1:270067789991:web:6f53669201ed68cb192b82"}}}}}}
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "topic-trail",
+          "appId": "1:270067789991:android:36d133d4a3a113e4192b82",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "topic-trail",
+          "configurations": {
+            "android": "1:270067789991:android:36d133d4a3a113e4192b82",
+            "ios": "1:270067789991:ios:e95f0aab6bb29540192b82",
+            "macos": "1:270067789991:ios:e95f0aab6bb29540192b82",
+            "web": "1:270067789991:web:fe888c6ceb17d43d192b82",
+            "windows": "1:270067789991:web:6f53669201ed68cb192b82"
+          }
+        }
+      }
+    }
+  },
+  "hosting": {
+    "public": "build/web",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  },
+  "database": {
+    "rules": "database.rules.json"
+  },
+  "firestore": {
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  },
+  "functions": [
+    {
+      "source": "functions",
+      "codebase": "default",
+      "ignore": [
+        "node_modules",
+        ".git",
+        "firebase-debug.log",
+        "firebase-debug.*.log",
+        "*.local"
+      ]
+    }
+  ],
+  "storage": {
+    "rules": "storage.rules"
+  },
+  "remoteconfig": {
+    "template": "remoteconfig.template.json"
+  },
+  "extensions": {}
+}

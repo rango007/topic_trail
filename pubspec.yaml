@@ -1,4 +1,4 @@
-name: topic_trail
+name: com.walletmantech.trails
 description: "A new way to consume information and stories."
 
 # Prevent accidental publishing to pub.dev.
@@ -35,7 +35,6 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
   flutter_lints: ^4.0.0
 
 flutter:
@@ -76,7 +75,12 @@ flutter:
     - family: Quicksand
       fonts:
         - asset: assets/Fonts/Quicksand/static/Quicksand-Regular.ttf
-        
-  #
+
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
+
+build:
+  web:
+    compiler:
+      options:
+        source_maps: true

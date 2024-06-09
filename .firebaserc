@@ -1,0 +1,14 @@
+{
+  "projects": {
+    "default": "topic-trail"
+  },
+  "targets": {},
+  "etags": {
+    "topic-trail": {
+      "extensionInstances": {
+        "storage-resize-images": "f30f26aed22b972a9f9de7f4f5f3b55a119523ba472ea1aa6bf7b8be80bbe3e0"
+      }
+    }
+  },
+  "dataconnectEmulatorConfig": {}
+}

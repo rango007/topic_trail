@@ -9,7 +9,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:270067789991:android:36d133d4a3a113e4192b82",
         "android_client_info": {
-          "package_name": "com.example.topic_trail"
+          "package_name": "com.walletmantech.trails"
         }
       },
       "oauth_client": [
@@ -34,7 +34,7 @@
               "client_id": "270067789991-7qhpqoq56ps28sp2kshrvs9ks3qiiads.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.example.topicTrail"
+                "bundle_id": "com.walletmantech.trails"
               }
             }
           ]

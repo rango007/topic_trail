@@ -65,7 +65,7 @@ class DefaultFirebaseOptions {
     projectId: 'topic-trail',
     storageBucket: 'topic-trail.appspot.com',
     iosClientId: '270067789991-7qhpqoq56ps28sp2kshrvs9ks3qiiads.apps.googleusercontent.com',
-    iosBundleId: 'com.example.topicTrail',
+    iosBundleId: 'com.walletmantech.trails',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
@@ -75,7 +75,7 @@ class DefaultFirebaseOptions {
     projectId: 'topic-trail',
     storageBucket: 'topic-trail.appspot.com',
     iosClientId: '270067789991-7qhpqoq56ps28sp2kshrvs9ks3qiiads.apps.googleusercontent.com',
-    iosBundleId: 'com.example.topicTrail',
+    iosBundleId: 'com.walletmantech.trails',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
